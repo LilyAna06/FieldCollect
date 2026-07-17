@@ -1,0 +1,59 @@
+{
+  "form_id": "rha",
+  "version": 1,
+  "title": "Rapid Habitat Assessment",
+  "description": "Stream reach habitat quality assessment. Nine scored parameters summing to a total habitat score out of 100. Draft schema — check parameter wording and score bands against your team's official RHA field sheet before field use.",
+  "sections": [
+    {
+      "id": "site_info",
+      "title": "Site information",
+      "fields": [
+        { "id": "site_name", "type": "text", "label": "Site / reach name", "required": true },
+        { "id": "observer", "type": "text", "label": "Observer name", "required": true },
+        { "id": "assessment_date", "type": "date", "label": "Date", "required": true },
+        { "id": "site_location", "type": "geopoint", "label": "Site location", "required": true },
+        { "id": "reach_length_m", "type": "number", "label": "Reach length assessed", "unit": "m", "min": 0 },
+        { "id": "flow_condition", "type": "select_one", "label": "Flow condition",
+          "options": ["Low flow", "Normal flow", "Freshet / high flow", "Flood"] },
+        { "id": "site_photo", "type": "photo", "label": "Site photos" }
+      ]
+    },
+    {
+      "id": "habitat_parameters",
+      "title": "Habitat parameters",
+      "fields": [
+        { "id": "p1_fine_sediment", "type": "scale", "label": "P1 — Fine sediment",
+          "hint": "Extent of fine sediment covering the streambed", "min": 1, "max": 20, "required": true },
+        { "id": "p2_substrate_composition", "type": "scale", "label": "P2 — Substrate composition",
+          "hint": "Diversity and quality of bed substrate", "min": 1, "max": 20, "required": true },
+        { "id": "p3_fish_cover", "type": "scale", "label": "P3 — Fish cover",
+          "hint": "Availability of cover for fish (undercut banks, woody debris, vegetation)", "min": 1, "max": 20, "required": true },
+        { "id": "p4_channel_form", "type": "scale", "label": "P4 — Channel form / bank stability",
+          "min": 1, "max": 20, "required": true },
+        { "id": "p5_water_clarity", "type": "scale", "label": "P5 — Water clarity",
+          "min": 1, "max": 10, "required": true },
+        { "id": "p6_hydraulic_heterogeneity", "type": "scale", "label": "P6 — Hydraulic habitat heterogeneity",
+          "hint": "Mix of riffle / run / pool flow types present", "min": 1, "max": 20, "required": true },
+        { "id": "p7_riparian_vegetation", "type": "scale", "label": "P7 — Riparian vegetation / fencing status",
+          "min": 1, "max": 10, "required": true },
+        { "id": "p8_riparian_shade", "type": "scale", "label": "P8 — Riparian shade",
+          "min": 1, "max": 10, "required": true },
+        { "id": "p9_channel_alteration", "type": "scale", "label": "P9 — Channel alteration",
+          "hint": "Degree of channel modification (straightening, lining, culverting)", "min": 1, "max": 10, "required": true },
+        { "id": "total_score", "type": "computed", "label": "Total RHA score (/100)",
+          "formula": "sum:p1_fine_sediment,p2_substrate_composition,p3_fish_cover,p4_channel_form,p5_water_clarity,p6_hydraulic_heterogeneity,p7_riparian_vegetation,p8_riparian_shade,p9_channel_alteration" }
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "Additional notes",
+      "fields": [
+        { "id": "general_notes", "type": "textarea", "label": "General observations / notes" },
+        { "id": "follow_up_needed", "type": "select_one", "label": "Follow-up required?",
+          "options": ["No", "Yes — resurvey", "Yes — refer to specialist"] },
+        { "id": "follow_up_details", "type": "textarea", "label": "Follow-up details",
+          "visible_if": "follow_up_needed != 'No'" }
+      ]
+    }
+  ]
+}
