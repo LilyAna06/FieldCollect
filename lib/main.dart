@@ -6,8 +6,8 @@ import 'ui/screens/login_screen.dart';
 
 // TODO: move these to --dart-define / a .env file before committing real
 // values. Placeholder keys here so the skeleton compiles out of the box.
-const _supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: 'https://YOUR-PROJECT.supabase.co');
-const _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'YOUR-ANON-KEY');
+const _supabaseUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: 'https://hhqrmodnxnpswjltpslc.supabase.co');
+const _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhocXJtb2RueG5wc3dqbHRwc2xjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzI4ODIsImV4cCI6MjA5OTc0ODg4Mn0.gtCYRsucB0oAGAsaHbAfBZhMQDbIEcPhzDR_XB-ZnHI');
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
