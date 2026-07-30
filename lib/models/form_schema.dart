@@ -6,7 +6,6 @@
 /// and piece of conditional logic comes from this schema, so adding a new
 /// monitoring type (cultural health, macroinvertebrate counts, etc.) is a
 /// matter of authoring a new JSON file, not writing new Dart code.
-library;
 
 enum FieldType {
   text,
@@ -15,7 +14,8 @@ enum FieldType {
   date,
   selectOne,
   selectMany,
-  scale, // bounded numeric score, e.g. 1-10 or 1-20, rendered as a slider/segmented control
+  scale, // bounded numeric score, e.g. 1-10, rendered as a slider — best for genuinely continuous/graphical scales
+  categoryScore, // discrete labeled options (e.g. "0%", "5%", "10%"...) each mapped to a fixed score — rendered as tappable buttons
   geopoint,
   geoshape, // polygon
   geotrace, // line / track
@@ -39,6 +39,8 @@ enum FieldType {
         return FieldType.selectMany;
       case 'scale':
         return FieldType.scale;
+      case 'category_score':
+        return FieldType.categoryScore;
       case 'geopoint':
         return FieldType.geopoint;
       case 'geoshape':
@@ -57,6 +59,19 @@ enum FieldType {
   }
 }
 
+/// A single tappable option for a [FieldType.categoryScore] field —
+/// e.g. label "20%" mapping to score 6.
+class CategoryOption {
+  final String label;
+  final num score;
+  CategoryOption({required this.label, required this.score});
+
+  factory CategoryOption.fromJson(Map<String, dynamic> json) => CategoryOption(
+        label: json['label'].toString(),
+        score: json['score'] as num,
+      );
+}
+
 class FormFieldDef {
   final String id;
   final FieldType type;
@@ -70,6 +85,9 @@ class FormFieldDef {
   /// scale / number bounds.
   final num? min;
   final num? max;
+
+  /// category_score options, in display order.
+  final List<CategoryOption>? categories;
 
   /// Simple conditional-visibility expression, e.g. "habitat_type == 'forest'".
   /// Evaluated against the current record's field values.
@@ -93,6 +111,7 @@ class FormFieldDef {
     this.options,
     this.min,
     this.max,
+    this.categories,
     this.visibleIf,
     this.formula,
     this.children,
@@ -109,6 +128,9 @@ class FormFieldDef {
       options: (json['options'] as List?)?.map((e) => e.toString()).toList(),
       min: json['min'] as num?,
       max: json['max'] as num?,
+      categories: (json['categories'] as List?)
+          ?.map((e) => CategoryOption.fromJson(e as Map<String, dynamic>))
+          .toList(),
       visibleIf: json['visible_if'] as String?,
       formula: json['formula'] as String?,
       unit: json['unit'] as String?,

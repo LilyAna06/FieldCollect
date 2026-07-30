@@ -140,6 +140,8 @@ class _FieldBuilder extends StatelessWidget {
         return _NumberInput(field: field, value: value, onChanged: onChanged);
       case FieldType.scale:
         return _ScaleInput(field: field, value: value, onChanged: onChanged);
+      case FieldType.categoryScore:
+        return _CategoryScoreInput(field: field, value: value, onChanged: onChanged);
       case FieldType.selectOne:
         return _SelectOneInput(field: field, value: value, onChanged: onChanged);
       case FieldType.selectMany:
@@ -205,9 +207,12 @@ class _NumberInput extends StatelessWidget {
   }
 }
 
-/// Bounded numeric score (e.g. RHA parameters 1-10 / 1-20) rendered as a
-/// slider with the current value shown — quick to fill out one-handed in
-/// the field.
+/// Bounded numeric score rendered as a slider — best for parameters where
+/// the paper form itself uses a continuous/graphical scale (repeated
+/// boundary labels across adjacent score columns) rather than distinct
+/// tap-able categories. The label wraps onto multiple lines rather than
+/// overflowing when it's long, and the score sits in a fixed-width badge
+/// that never gets pushed off-screen.
 class _ScaleInput extends StatelessWidget {
   final FormFieldDef field;
   final dynamic value;
@@ -223,17 +228,15 @@ class _ScaleInput extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(field.required ? '${field.label} *' : field.label,
-                style: Theme.of(context).textTheme.bodyLarge),
-            Text(current.round().toString(),
-                style: Theme.of(context).textTheme.titleMedium),
-          ],
+        _FieldHeader(
+          label: field.required ? '${field.label} *' : field.label,
+          scoreText: current.round().toString(),
         ),
         if (field.hint != null)
-          Text(field.hint!, style: Theme.of(context).textTheme.bodySmall),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(field.hint!, style: Theme.of(context).textTheme.bodySmall),
+          ),
         Slider(
           value: current,
           min: min,
@@ -241,6 +244,132 @@ class _ScaleInput extends StatelessWidget {
           divisions: (max - min).round(),
           label: current.round().toString(),
           onChanged: (v) => onChanged(v.round()),
+        ),
+      ],
+    );
+  }
+}
+
+/// Discrete labeled options (e.g. "0%", "5%", "10%"...), each mapping to a
+/// fixed score — rendered as a horizontally scrollable row of tappable
+/// buttons, matching how the paper RHA sheet presents these parameters:
+/// pick the condition category that matches what you observed, and the
+/// score comes along with it automatically. Best for parameters where
+/// each category maps to exactly one score (no overlap/ranges).
+class _CategoryScoreInput extends StatelessWidget {
+  final FormFieldDef field;
+  final dynamic value;
+  final void Function(dynamic) onChanged;
+  const _CategoryScoreInput({required this.field, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final categories = field.categories ?? [];
+    final selectedScore = value is num ? value : null;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _FieldHeader(
+            label: field.required ? '${field.label} *' : field.label,
+            scoreText: selectedScore?.round().toString() ?? '—',
+          ),
+          if (field.hint != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 10),
+              child: Text(field.hint!, style: Theme.of(context).textTheme.bodySmall),
+            ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final category in categories) ...[
+                  _CategoryChip(
+                    label: category.label,
+                    selected: selectedScore == category.score,
+                    onTap: () => onChanged(category.score),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _CategoryChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 44),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? scheme.primary : scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shared header row for scored fields: label on the left (wraps if long),
+/// score badge fixed on the right — never overflows regardless of label
+/// length.
+class _FieldHeader extends StatelessWidget {
+  final String label;
+  final String scoreText;
+  const _FieldHeader({required this.label, required this.scoreText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
+        ),
+        const SizedBox(width: 12),
+        Container(
+          width: 40,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            scoreText,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
         ),
       ],
     );
@@ -383,7 +512,7 @@ class _GeopointInputState extends State<_GeopointInput> {
             padding: const EdgeInsets.only(top: 6),
             child: Text(
               '${point['lat'].toStringAsFixed(6)}, ${point['lng'].toStringAsFixed(6)}'
-              '${point['accuracy_m'] != null ? ' (±${(point['accuracy_m'] as num).toStringAsFixed(0)}m)' : ''}',
+              '${point['accuracy_m'] != null ? ' (\u00b1${(point['accuracy_m'] as num).toStringAsFixed(0)}m)' : ''}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -468,8 +597,8 @@ class _ComputedDisplay extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(field.label, style: Theme.of(context).textTheme.bodyLarge),
-          Text(value?.toString() ?? '—', style: Theme.of(context).textTheme.titleMedium),
+          Flexible(child: Text(field.label, style: Theme.of(context).textTheme.bodyLarge)),
+          Text(value?.toString() ?? '\u2014', style: Theme.of(context).textTheme.titleMedium),
         ],
       ),
     );

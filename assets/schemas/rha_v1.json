@@ -1,8 +1,8 @@
 {
   "form_id": "rha",
-  "version": 2,
+  "version": 3,
   "title": "River Habitat Assessment (RHA)",
-  "description": "Stream reach habitat quality assessment. Ten scored parameters (1-10 each) summing to a total habitat score out of 100, matching the official RHA Field Recording Sheet.",
+  "description": "Stream reach habitat quality assessment. Ten scored parameters (1-10 each) summing to a total habitat score out of 100, matching the official RHA Field Recording Sheet. Parameters with a clean 1-to-1 category-to-score mapping use tap-to-select buttons; parameters 2, 4, and 6 use a slider since the paper form itself treats them as a continuous scale.",
   "sections": [
     {
       "id": "site_info",
@@ -22,39 +22,63 @@
       "id": "habitat_parameters",
       "title": "Habitat parameters",
       "fields": [
-        { "id": "p1_deposited_sediment", "type": "scale", "label": "1. Deposited sediment",
-          "hint": "% of streambed covered by fine sediment. 0%=10, 5%=9, 10%=8, 15%=7, 20%=6, 30%=5, 40%=4, 50%=3, 60%=2, ≥75%=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p1_deposited_sediment", "type": "category_score", "label": "1. Deposited sediment",
+          "hint": "The percentage (%) of stream bed covered by fine sediment.",
+          "required": true,
+          "categories": [
+            {"label": "0", "score": 10}, {"label": "5", "score": 9}, {"label": "10", "score": 8},
+            {"label": "15", "score": 7}, {"label": "20", "score": 6}, {"label": "30", "score": 5},
+            {"label": "40", "score": 4}, {"label": "50", "score": 3}, {"label": "60", "score": 2},
+            {"label": "\u226575", "score": 1}
+          ] },
 
         { "id": "p2_invertebrate_habitat_diversity", "type": "scale", "label": "2. Invertebrate habitat diversity",
-          "hint": "Number of different substrate types (boulders, cobbles, gravel, sand, wood, leaves, root mats, macrophytes, periphyton). Presence of interstitial space scores higher. ≥5 types=10, down to 1 type=1",
+          "hint": "Number of different substrate types (boulders, cobbles, gravel, sand, wood, leaves, root mats, macrophytes, periphyton). Presence of interstitial space scores higher. \u22655 types=10, down to 1 type=1",
           "min": 1, "max": 10, "required": true },
 
-        { "id": "p3_invertebrate_habitat_abundance", "type": "scale", "label": "3. Invertebrate habitat abundance",
-          "hint": "% of substrate favourable for EPT colonisation (flowing water over gravel/cobbles clear of filamentous algae/macrophytes). 95%=10, 75%=9, 70%=8, 60%=7, 50%=6, 40%=5, 30%=4, 25%=3, 15%=2, 5%=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p3_invertebrate_habitat_abundance", "type": "category_score", "label": "3. Invertebrate habitat abundance",
+          "hint": "The percentage (%) of substrate favourable for EPT colonisation (flowing water over gravel/cobbles clear of filamentous algae/macrophytes).",
+          "required": true,
+          "categories": [
+            {"label": "95", "score": 10}, {"label": "75", "score": 9}, {"label": "70", "score": 8},
+            {"label": "60", "score": 7}, {"label": "50", "score": 6}, {"label": "40", "score": 5},
+            {"label": "30", "score": 4}, {"label": "25", "score": 3}, {"label": "15", "score": 2},
+            {"label": "5", "score": 1}
+          ] },
 
         { "id": "p4_fish_cover_diversity", "type": "scale", "label": "4. Fish cover diversity",
-          "hint": "Number of different substrate types (woody debris, root mats, undercut banks, overhanging/encroaching vegetation, macrophytes, boulders, cobbles). Spatial complexity scores higher. ≥5 types=10, down to 1 type=1",
+          "hint": "Number of different substrate types (woody debris, root mats, undercut banks, overhanging/encroaching vegetation, macrophytes, boulders, cobbles). Spatial complexity scores higher. \u22655 types=10, down to 1 type=1",
           "min": 1, "max": 10, "required": true },
 
-        { "id": "p5_fish_cover_abundance", "type": "scale", "label": "5. Fish cover abundance",
-          "hint": "% of fish cover available. 95%=10, 75%=9, 60%=8, 50%=7, 40%=6, 30%=5, 20%=4, 10%=3, 5%=2, 0%=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p5_fish_cover_abundance", "type": "category_score", "label": "5. Fish cover abundance",
+          "hint": "The percentage (%) of fish cover available.",
+          "required": true,
+          "categories": [
+            {"label": "95", "score": 10}, {"label": "75", "score": 9}, {"label": "60", "score": 8},
+            {"label": "50", "score": 7}, {"label": "40", "score": 6}, {"label": "30", "score": 5},
+            {"label": "20", "score": 4}, {"label": "10", "score": 3}, {"label": "5", "score": 2},
+            {"label": "0", "score": 1}
+          ] },
 
         { "id": "p6_hydraulic_heterogeneity", "type": "scale", "label": "6. Hydraulic heterogeneity",
-          "hint": "Number of hydraulic components (pool, riffle, fast run, slow run, rapid, cascade/waterfall, turbulence, backwater). Presence of deep pools scores higher. ≥5=10, down to 1=1",
+          "hint": "Number of hydraulic components (pool, riffle, fast run, slow run, rapid, cascade/waterfall, turbulence, backwater). Presence of deep pools scores higher. \u22655=10, down to 1=1",
           "min": 1, "max": 10, "required": true },
 
-        { "id": "p7_bank_erosion_left_pct", "type": "number", "label": "7. Bank erosion — left bank",
+        { "id": "p7_bank_erosion_left_pct", "type": "number", "label": "7. Bank erosion \u2014 left bank",
           "hint": "% of left bank recently/actively eroding (scouring at waterline, slumping, stock pugging)", "unit": "%", "min": 0, "max": 100 },
-        { "id": "p7_bank_erosion_right_pct", "type": "number", "label": "7. Bank erosion — right bank",
+        { "id": "p7_bank_erosion_right_pct", "type": "number", "label": "7. Bank erosion \u2014 right bank",
           "hint": "% of right bank recently/actively eroding", "unit": "%", "min": 0, "max": 100 },
-        { "id": "p7_bank_erosion_score", "type": "scale", "label": "7. Bank erosion — score",
-          "hint": "Based on both banks above. 0%=10, ≤5%=9, 5%=8, 15%=7, 25%=6, 35%=5, 50%=4, 65%=3, 75%=2, >75%=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p7_bank_erosion_score", "type": "category_score", "label": "7. Bank erosion \u2014 score",
+          "hint": "Based on both banks above.",
+          "required": true,
+          "categories": [
+            {"label": "0", "score": 10}, {"label": "\u22645", "score": 9}, {"label": "5", "score": 8},
+            {"label": "15", "score": 7}, {"label": "25", "score": 6}, {"label": "35", "score": 5},
+            {"label": "50", "score": 4}, {"label": "65", "score": 3}, {"label": "75", "score": 2},
+            {"label": "\u226575", "score": 1}
+          ] },
 
-        { "id": "p8_bank_vegetation_category", "type": "select_one", "label": "8. Bank vegetation — category",
+        { "id": "p8_bank_vegetation_category", "type": "select_one", "label": "8. Bank vegetation \u2014 category",
           "hint": "Assess both banks together",
           "options": [
             "Mature native trees with diverse and intact understorey",
@@ -62,21 +86,33 @@
             "Mature shrubs, sparse tree cover > young exotic, long grass",
             "Heavily grazed or mown grass > bare/impervious ground"
           ] },
-        { "id": "p8_bank_vegetation_score", "type": "scale", "label": "8. Bank vegetation — score",
-          "hint": "Maturity, diversity and naturalness of bank vegetation, both banks",
+        { "id": "p8_bank_vegetation_score", "type": "scale", "label": "8. Bank vegetation \u2014 score",
+          "hint": "Maturity, diversity and naturalness of bank vegetation, both banks \u2014 each category above spans a range of scores, so fine-tune within it here.",
           "min": 1, "max": 10, "required": true },
 
-        { "id": "p9_riparian_width_left_m", "type": "number", "label": "9. Riparian width — left bank",
+        { "id": "p9_riparian_width_left_m", "type": "number", "label": "9. Riparian width \u2014 left bank",
           "hint": "Width (m) of riparian buffer constrained by vegetation, fence, or other structure(s)", "unit": "m", "min": 0 },
-        { "id": "p9_riparian_width_right_m", "type": "number", "label": "9. Riparian width — right bank",
+        { "id": "p9_riparian_width_right_m", "type": "number", "label": "9. Riparian width \u2014 right bank",
           "hint": "Width (m) of riparian buffer, right bank", "unit": "m", "min": 0 },
-        { "id": "p9_riparian_width_score", "type": "scale", "label": "9. Riparian width — score",
-          "hint": "Based on both banks above. ≥30m=10, 15m=9, 10m=8, 7m=7, 5m=6, 4m=5, 3m=4, 2m=3, 1m=2, 0m=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p9_riparian_width_score", "type": "category_score", "label": "9. Riparian width \u2014 score",
+          "hint": "Based on both banks above (metres).",
+          "required": true,
+          "categories": [
+            {"label": "\u226530", "score": 10}, {"label": "15", "score": 9}, {"label": "10", "score": 8},
+            {"label": "7", "score": 7}, {"label": "5", "score": 6}, {"label": "4", "score": 5},
+            {"label": "3", "score": 4}, {"label": "2", "score": 3}, {"label": "1", "score": 2},
+            {"label": "0", "score": 1}
+          ] },
 
-        { "id": "p10_riparian_shade", "type": "scale", "label": "10. Riparian shade",
-          "hint": "% shading of the streambed throughout the day due to vegetation, banks, or other structure(s). ≥90%=10, 80%=9, 70%=8, 60%=7, 50%=6, 40%=5, 25%=4, 15%=3, 10%=2, ≤5%=1",
-          "min": 1, "max": 10, "required": true },
+        { "id": "p10_riparian_shade", "type": "category_score", "label": "10. Riparian shade",
+          "hint": "The percentage (%) shading of the stream bed throughout the day due to vegetation, banks, or other structure(s).",
+          "required": true,
+          "categories": [
+            {"label": "\u226590", "score": 10}, {"label": "80", "score": 9}, {"label": "70", "score": 8},
+            {"label": "60", "score": 7}, {"label": "50", "score": 6}, {"label": "40", "score": 5},
+            {"label": "25", "score": 4}, {"label": "15", "score": 3}, {"label": "10", "score": 2},
+            {"label": "\u22645", "score": 1}
+          ] },
 
         { "id": "total_score", "type": "computed", "label": "Total RHA score (/100)",
           "formula": "sum:p1_deposited_sediment,p2_invertebrate_habitat_diversity,p3_invertebrate_habitat_abundance,p4_fish_cover_diversity,p5_fish_cover_abundance,p6_hydraulic_heterogeneity,p7_bank_erosion_score,p8_bank_vegetation_score,p9_riparian_width_score,p10_riparian_shade" }
@@ -88,7 +124,7 @@
       "fields": [
         { "id": "general_notes", "type": "textarea", "label": "General observations / notes" },
         { "id": "follow_up_needed", "type": "select_one", "label": "Follow-up required?",
-          "options": ["No", "Yes — resurvey", "Yes — refer to specialist"] },
+          "options": ["No", "Yes \u2014 resurvey", "Yes \u2014 refer to specialist"] },
         { "id": "follow_up_details", "type": "textarea", "label": "Follow-up details",
           "visible_if": "follow_up_needed != 'No'" }
       ]
