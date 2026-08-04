@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Email + password sign-in, with a toggle to create an account instead.
-///
-/// Supabase persists the session locally (encrypted local storage) once
-/// signed in, so field workers only need to authenticate once while they
-/// have connectivity — the session survives app restarts and works fine
-/// offline afterward. Only the actual data sync calls need a live
-/// connection, not the "am I logged in" check.
+/// Email + password sign-in, with a toggle to create an account instead,
+/// plus a Google sign-in option.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -53,12 +48,31 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        // On success, the AuthGate in main.dart picks up the session change
-        // automatically via the auth state stream — no manual navigation
-        // needed here.
       }
     } on AuthException catch (e) {
       setState(() => _error = e.message);
+    } catch (e) {
+      setState(() => _error = 'Something went wrong: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  /// Kicks off the Google OAuth flow. Supabase opens the system browser
+  /// for the actual Google sign-in, then redirects back into the app via
+  /// the custom URL scheme registered in AndroidManifest.xml / Info.plist.
+  /// The AuthGate in main.dart picks up the resulting session
+  /// automatically, same as email/password.
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'fieldmonitorapp://login-callback',
+      );
     } catch (e) {
       setState(() => _error = 'Something went wrong: $e');
     } finally {
@@ -99,6 +113,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 32),
+
+                OutlinedButton.icon(
+                  onPressed: _loading ? null : _signInWithGoogle,
+                  icon: const Icon(Icons.login),
+                  label: const Text('Continue with Google'),
+                ),
+
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('or', style: Theme.of(context).textTheme.bodySmall),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
